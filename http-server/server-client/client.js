@@ -1,19 +1,35 @@
 const qs = require('querystring')
 const http = require('http')
 
-http.request({
-  host:'127.0.0.1',
-  port:3000,
-  url:'/',
-  method:'GET'
-},(res)=>{
-  let body=''
-  res.setEncoding('utf8')
-  res.on('data',(chunk)=>{
-    body += chunk
+function send(theName){
+  const postData = qs.stringify({'name':theName})
+  const req = http.request({
+    host:'127.0.0.1',
+    port:3000,
+    url:'/',
+    method:'POST',
+  },(res)=>{
+
+    res.setEncoding('utf8')
+    res.on('data', (chunk) => {
+
+    });
+    res.on('end',()=>{
+      console.log('\n request complete! \n')
+      process.stdout.write('\n your name:')
+    })
   })
-  console.log(1)
-  res.on('end',()=>{
-    console.log(`\n we got: body \n`)
-  })
-}).end()
+
+  req.on('error', (e) => {
+    console.error(`请求遇到问题: ${e.message}`);
+  });
+
+  req.end(postData)
+}
+
+process.stdout.write('\n your name:')
+process.stdin.resume()
+process.stdin.setEncoding('utf-8')
+process.stdin.on('data',(name)=>{
+  send(name.replace('\n',''))
+})
